@@ -29,12 +29,11 @@ int main(){
   //Neural Net training
   NeuralNet network(2,3,8,5);
   Matrix out = network.eval(inputs[100]);
-  out = network.eval(inputs[100]);
   cout << "Loaded network. Sample evaluation:\nIN: " << inputs[100] << "OUT: " << out;
   cout <<"Training...\n";
-  //network.train(inputs,outputs);
+  network.train(inputs,outputs);
   cout << "Evaluating...\n";
-//  out = network.eval(inputs[100]);
-//  cout << out << endl;
+  out = network.eval(inputs[100]);
+  cout << out << endl;
   return 0;
 }

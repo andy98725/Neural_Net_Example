@@ -2,8 +2,8 @@
 PImage product;
 final boolean dispOutFile = false;
 final boolean convertSize = false;
-final boolean isInt = true;
-final int conversionRate = 1;
+final boolean isInt = false;
+final int conversionRate = 255;
 void setup() {
   size(200, 200);
   convertTraining("/training.png", "../training.txt");

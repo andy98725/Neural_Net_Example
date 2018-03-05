@@ -15,9 +15,8 @@ Matrix::Matrix (int r, int c, float v)
 {
   this->r = r;
   this->c = c;
-  this->arr = new float[r*c];
   for(int i = 0; i < r*c; i++){
-      arr[i] = v;
+      arr.push_back(v);
   }
 
 
@@ -26,18 +25,16 @@ Matrix::Matrix (int r, int c, float v)
 Matrix::Matrix(int r, int c, float* temparr){
   this->r = r;
   this->c = c;
-  this->arr = new float[r*c];
   for(int i = 0; i < r*c; ++i){
-      this->arr[i] = temparr[i];
+      arr.push_back(temparr[i]);
   }
 }
 //Copy constructor
 Matrix::Matrix(const Matrix& m){
   this->r = m.r;
   this->c = m.c;
-  this->arr = new float[r*c];
   for(int i = 0; i < r*c; i++){
-      arr[i] = m.arr[i];
+      arr.push_back(m.arr[i]);
   }
 
 }
@@ -50,10 +47,9 @@ Matrix::Matrix(initializer_list<initializer_list<float>> l){
       if(c == -1){
 	  //Finish definition
 	  c = ll.size();
-	  arr = new float[r*c];
       }
       for(float v : ll){
-      arr[i++] = v;
+      arr.push_back(v);
       }
   }
   //Catch poorly structured lists
@@ -64,7 +60,7 @@ Matrix::Matrix(initializer_list<initializer_list<float>> l){
 //Destructor
 Matrix::~Matrix ()
 {
-  delete[] arr;
+  arr.clear();
 }
 //get
 float Matrix::get(int row, int col){

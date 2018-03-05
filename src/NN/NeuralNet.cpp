@@ -81,6 +81,11 @@ NeuralNet::backprop (vector<Matrix> ins, vector<Matrix> outs, float delta)
   //Evaluate and backpropogate through each and every data set.
   //Once done, alter weights and biases according to average error.
 
+  //Catch bad cases
+  if(ins.size() == 0)
+    throw invalid_argument("Backprop failure: Empty input vector.");
+  if(ins.size() != outs.size())
+    throw invalid_argument("Backprop failure: Mismatched input and output vectors.");
   //Init error matricies
   vector<Matrix> totWeightError, caseWeightError;
   vector<Matrix> totBaseError, caseBaseError;
@@ -116,30 +121,23 @@ NeuralNet::backprop (vector<Matrix> ins, vector<Matrix> outs, float delta)
       //Eval data
       Matrix output = eval (ins[i]);
       //Backprop
-      cout << i << endl;
-      cout << "loop\n";
       for (int layer = layers - 1; layer >= 0; --layer)
 	{
-	  cout << "q\n";
 	  Matrix layerError;
-	  cout << "a\n";
 	  if (layer == layers - 1) //For final layer, error is the difference of output/expected output times the rate of change
 	    layerError = (output - outs[i]) * delta;
 	  else
 	    //For other layers, The error is the error of the next layer dot the weights of that layer
-	    layerError = Matrix(caseBaseError[layer + 1]
-		* (weights[layer + 1].transpose ()));
-	  cout << "b\n";
+	    layerError = Matrix (
+		caseBaseError[layer + 1] * (weights[layer + 1].transpose ()));
 	  //Finally, we have to hadamard the layer with the rate of change of that node
-	  layerError = layerError % (values[layer + 1].apply(sigmoidPrime));
-	  cout << "c\n";
+	  layerError = layerError % (values[layer + 1].apply (sigmoidPrime));
 	  //Now we have the layer's error.
 	  //The error of the base is actually equal to the layer's error
-	  caseBaseError[layer] = Matrix(layerError);
-	  cout << "d\n";
+	  caseBaseError[layer] = Matrix (layerError);
 	  //And the weight error is the previous layer's activations transposed dot the layer's error
-	  caseWeightError[layer] = Matrix(activations[layer].transpose () * layerError);
-	  cout << "e\n";
+	  caseWeightError[layer] = Matrix (
+	      activations[layer].transpose () * layerError);
 	}
       //Done backpropogating. Apply case to total and move on.
       for (int j = 0; j < layers; ++j)
@@ -160,17 +158,38 @@ NeuralNet::backprop (vector<Matrix> ins, vector<Matrix> outs, float delta)
       bases[i] = bases[i] + (totBaseError[i] / ins.size ());
     }
 }
-
+void
+NeuralNet::escelate (vector<Matrix> ins, vector<Matrix> outs, int times)
+{
+  //Trains 10 times
+  const int MAX = times;
+  for(int t = 0; t < MAX; ++t){
+      vector<Matrix> inset, outset;
+      //Get 10 random test cases for each iteration that's happened, plus base 20 (escalating count)
+      for(int iter = 0; iter < 20 + t*10; ++iter){
+	  //Choose a random from base set and add it
+	  int index = rand() % ins.size();
+	  inset.push_back(ins[index]);
+	  outset.push_back(outs[index]);
+      }
+      //Now, backprop set with offset
+      float offset = 0.25 - (0.2 * t) / MAX; //Deescelating for accuracy
+      backprop(inset, outset, offset);
+      cout << "Backproped " + to_string(t) + " times.\n";
+  }
+}
 void
 NeuralNet::train (vector<Matrix> ins, vector<Matrix> outs)
 {
   //No fancy logic here yet. May implement selective/spot training soon.
   //Load the first 10 of each
-  vector<Matrix> input, output;
-  for (int i = 0; i < 10; ++i)
-    {
-      input.push_back (ins[i]);
-      output.push_back (outs[i]);
-    }
-  backprop (input, output, 0.15);
+  /*
+   vector<Matrix> input, output;
+   for (int i = 0; i < 100; ++i)
+   {
+   input.push_back (ins[i]);
+   output.push_back (outs[i]);
+   }*/
+  escelate(ins,outs, 20);
+//  backprop (ins, outs, 0.15);
 }

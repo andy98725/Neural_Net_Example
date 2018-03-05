@@ -12,12 +12,13 @@ using namespace std;
 #include <string>
 #include <stdexcept>
 #include <iostream>
+#include <vector>
 
 class Matrix
 {
 private:
   int r, c;
-  float *arr;
+  vector<float> arr;
 public:
   //Default/Dimension constructor
   Matrix(int r = 1, int c = 1, float v = 0);

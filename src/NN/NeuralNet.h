@@ -11,6 +11,7 @@ using namespace std;
 #include "../math/Matrix.h"
 #include "../math/sigFunctions.h"
 #include <vector>
+#include <stdexcept>
 class NeuralNet
 {
 private:
@@ -29,6 +30,7 @@ public:
   void train(vector<Matrix>, vector<Matrix>);
   void backprop(vector<Matrix>, vector<Matrix>, float);
 
+  void escelate(vector<Matrix>, vector<Matrix>, int);
 };
 
 #endif /* NEURALNET_H_ */
