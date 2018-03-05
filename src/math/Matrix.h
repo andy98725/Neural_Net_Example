@@ -11,6 +11,7 @@ using namespace std;
 
 #include <string>
 #include <stdexcept>
+#include <iostream>
 
 class Matrix
 {

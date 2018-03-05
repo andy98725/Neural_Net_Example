@@ -23,10 +23,13 @@ Matrix::Matrix (int r, int c, float v)
 
 }
 //Array constructor
-Matrix::Matrix(int r, int c, float* arr){
+Matrix::Matrix(int r, int c, float* temparr){
   this->r = r;
   this->c = c;
-  this->arr = arr;
+  this->arr = new float[r*c];
+  for(int i = 0; i < r*c; ++i){
+      this->arr[i] = temparr[i];
+  }
 }
 //Copy constructor
 Matrix::Matrix(const Matrix& m){
@@ -61,7 +64,7 @@ Matrix::Matrix(initializer_list<initializer_list<float>> l){
 //Destructor
 Matrix::~Matrix ()
 {
-  delete arr;
+  delete[] arr;
 }
 //get
 float Matrix::get(int row, int col){
@@ -103,7 +106,7 @@ string Matrix::getString(){
       ret += '}';
       if(i+1 < r) ret += ",\n";
   }
-  ret += '}';
+  ret += "}\n";
   return ret;
 }
 //String output

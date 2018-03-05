@@ -12,21 +12,19 @@
 #include <sstream>
 #include<fstream>
 #include <stdexcept>
-#include <iostream>
+#include <vector>
 
 #include "math/Matrix.h"
 using namespace std;
 
 class FileReader{
 private:
-  int size;
-  Matrix* inputs;
-  Matrix* outputs;
+  vector<Matrix> inputs;
+  vector<Matrix> outputs;
 public:
   FileReader(string);
-  int getSize();
-  Matrix* getInputs();
-  Matrix* getOutputs();
+  vector<Matrix> getInputs();
+  vector<Matrix> getOutputs();
 
 };
 
