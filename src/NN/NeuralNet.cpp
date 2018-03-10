@@ -39,6 +39,7 @@ NeuralNet::NeuralNet (int inCount, int outCount, int hiddenCount, int layers)
     }
 
 }
+//Other declarator is by saveto for paralleling
 
 NeuralNet::~NeuralNet ()
 {
@@ -59,7 +60,6 @@ NeuralNet::eval (Matrix in)
   activations.push_back (Matrix (in));
   for (int i = 0; i < layers; ++i)
     {
-//      cout << values.back();
       values.push_back (activations.back () * weights[i] + bases[i]);
       activations.push_back (values.back ().apply (sigmoid));
     }
@@ -161,7 +161,7 @@ NeuralNet::backprop (vector<Matrix> ins, vector<Matrix> outs, float delta)
 void
 NeuralNet::escelate (vector<Matrix> ins, vector<Matrix> outs, int times)
 {
-  //Trains 10 times
+  //Trains N times
   const int MAX = times;
   for(int t = 0; t < MAX; ++t){
       vector<Matrix> inset, outset;
@@ -175,21 +175,39 @@ NeuralNet::escelate (vector<Matrix> ins, vector<Matrix> outs, int times)
       //Now, backprop set with offset
       float offset = 0.25 - (0.2 * t) / MAX; //Deescelating for accuracy
       backprop(inset, outset, offset);
-      cout << "Backproped " + to_string(t) + " times.\n";
   }
 }
 void
 NeuralNet::train (vector<Matrix> ins, vector<Matrix> outs)
 {
-  //No fancy logic here yet. May implement selective/spot training soon.
-  //Load the first 10 of each
-  /*
-   vector<Matrix> input, output;
-   for (int i = 0; i < 100; ++i)
-   {
-   input.push_back (ins[i]);
-   output.push_back (outs[i]);
-   }*/
-  escelate(ins,outs, 20);
-//  backprop (ins, outs, 0.15);
+  for(int k = 0; k < 10; ++k)
+  escelate(ins,outs, 10);
+}
+//Load from file
+NeuralNet::NeuralNet (string filename){
+  ifstream file(filename);
+  for(string line; getline(file, line);){
+      Matrix a(line);
+      weights.push_back(a);
+      getline(file,line);
+      Matrix b(line);
+      bases.push_back(b);
+  }
+  layers = weights.size();
+  inCount = weights[0].getr();
+  hidCount = weights[0].getc();
+  outCount = weights[layers-1].getc();
+  file.close();
+
+
+}
+//Save to file
+void NeuralNet::saveto (string filename){
+  ofstream file(filename);
+  for(unsigned int i = 0; i < weights.size(); ++i){
+      file << (weights[i].write()) << endl << (bases[i].write());
+      if(i + 1 < weights.size()) file << endl;
+  }
+  file.close();
+
 }

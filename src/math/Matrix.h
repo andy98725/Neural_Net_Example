@@ -9,32 +9,38 @@
 #define MATRIX_H_
 using namespace std;
 
-#include <string>
-#include <stdexcept>
-#include <iostream>
-#include <vector>
+#include <string> //string (constructors, etc)
+#include <stdexcept> //throws (constructors, etc)
+#include <iostream> //cout (bugtesting)
+#include <sstream> //stringstream (read, write)
+#include <vector> //vector arr (data)
 
 class Matrix
 {
 private:
-  int r, c;
+  unsigned int r, c;
   vector<float> arr;
 public:
   //Default/Dimension constructor
-  Matrix(int r = 1, int c = 1, float v = 0);
+  Matrix(unsigned int r = 1, unsigned int c = 1, float v = 0);
   //Array initializer
   Matrix(int, int, float*);
   //Copy constructor
   Matrix(const Matrix&);
   //Bracket constructor
-  Matrix(std::initializer_list<std::initializer_list<float>>);
+  Matrix(initializer_list<initializer_list<float>>);
+  //String constructor
+  Matrix(string);
   //Destructor
   virtual
   ~Matrix ();
+  //Get size
+  unsigned int getr();
+  unsigned int getc();
   //Get value
-  float get(int, int);
+  float get(unsigned int, unsigned int);
   //Set value
-  void set(int, int, float);
+  void set(unsigned int, unsigned int, float);
   //Transpose
   Matrix transpose();
   //Readable output
@@ -49,6 +55,11 @@ public:
 
   //Matrixwise apply function
   Matrix apply(float (*)(float));
+
+  //Load from string
+  void read(string);
+  //Save to string
+  string write();
 };
 //Output
 ostream &operator<<(ostream&, Matrix&);

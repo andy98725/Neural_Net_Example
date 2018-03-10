@@ -14,26 +14,35 @@
 #include <iostream>
 #include <vector>
 
+
 #include "import.h"
+#include "export.h"
 #include "math/Matrix.h"
 #include "NN/NeuralNet.h"
 using namespace std;
 
+void trainFromData(NeuralNet&);
 int main(){
-  //Read data
-  cout << "Initiated.\n";
-  FileReader import("training.txt");
-  cout << "Loaded training data.\n";
-  vector<Matrix> inputs = import.getInputs();
-  vector<Matrix> outputs = import.getOutputs();
-  //Neural Net training
-  NeuralNet network(2,3,8,5);
-  Matrix out = network.eval(inputs[100]);
-  cout << "Loaded network. Sample evaluation:\nIN: " << inputs[100] << "OUT: " << out;
-  cout <<"Training...\n";
-  network.train(inputs,outputs);
-  cout << "Evaluating...\n";
-  out = network.eval(inputs[100]);
-  cout << out << endl;
+  NeuralNet baby("NNets/beginnerNet.nn");
+
+  cout << "Initiated net.\n";
+  Matrix out = baby.eval(Matrix{{0,0}});
+  cout << "Pre eval at 0,0:\n" << out;
+  cout << "Training net...\n";
+  trainFromData(baby);
+  out = baby.eval(Matrix{{0,0}});
+  cout << "Post eval at 0,0:\n" << out;
+  baby.saveto("NNets/beginnerNet.nn");
+  int a;
+  cin >> a;
+  //FileWriter ex(469,376, baby, "out.txt");
   return 0;
+}
+void trainFromData(NeuralNet &net){
+  //Read data from file
+  FileReader import("training.txt");
+  cout << "Loaded training data.\nBeginning training...\n";
+  //Train network
+  net.train(import.getInputs(),import.getOutputs());
+  cout << "Training complete.\n";
 }

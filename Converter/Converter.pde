@@ -1,6 +1,6 @@
 
 PImage product;
-final boolean dispOutFile = false;
+final boolean dispOutFile = true;
 final boolean convertSize = false;
 final boolean isInt = false;
 final int conversionRate = 255;
@@ -31,6 +31,8 @@ void convertTraining(String filename, String savename) {
     converted = new String[convert.width*convert.height];
     index = 0;
   }
+    println(convert.width);
+    println(convert.height);
   convert.loadPixels();
   for (int j = 0; j < convert.height; j++) for (int i = 0; i < convert.width; i++) {
     if (!isInt)
