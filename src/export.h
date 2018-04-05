@@ -11,7 +11,7 @@
 #include "NN/NeuralNet.h"
 #include "math/Matrix.h"
 #include<fstream>
-
+using namespace std;
 class FileWriter{
 private:
   int wid;

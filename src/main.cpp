@@ -23,18 +23,22 @@ using namespace std;
 
 void trainFromData(NeuralNet&);
 int main(){
+  //Load NN from file
   NeuralNet baby("NNets/beginnerNet.nn");
 
   cout << "Initiated net.\n";
+  //Sample evaluation
   Matrix out = baby.eval(Matrix{{0,0}});
   cout << "Pre eval at 0,0:\n" << out;
   cout << "Training net...\n";
+  //Training function
   trainFromData(baby);
+  //Sample evaluation
   out = baby.eval(Matrix{{0,0}});
   cout << "Post eval at 0,0:\n" << out;
+  //Save work
   baby.saveto("NNets/beginnerNet.nn");
-  int a;
-  cin >> a;
+  //Generate image
   //FileWriter ex(469,376, baby, "out.txt");
   return 0;
 }

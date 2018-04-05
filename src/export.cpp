@@ -6,6 +6,7 @@
  */
 
 #include "export.h"
+using namespace std;
 
 FileWriter::FileWriter (int w, int h, NeuralNet nn, string filename) :
     wid (w), hei (h), net (nn)

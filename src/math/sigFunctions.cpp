@@ -5,7 +5,7 @@
  *      Author: Andy
  */
 
-#include "sigFunctions.h";
+#include "sigFunctions.h"
 
 float sigmoid(float in){
   return 1 / (1 + exp (in));

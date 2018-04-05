@@ -24,7 +24,11 @@ private:
   vector<Matrix> bases;
   vector<Matrix> values;
   vector<Matrix> activations;
+  vector<Matrix> weightsError;
+  vector<Matrix> basesError;
   void resetEval();
+  void resetErrors();
+  void backpropCase(Matrix in, Matrix out);
 public:
   //Declare randomized/ "new" neural net
   NeuralNet (int inCount, int outCount, int hiddenCount, int layers);
