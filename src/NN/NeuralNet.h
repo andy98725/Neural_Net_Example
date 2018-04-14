@@ -14,7 +14,7 @@ using namespace std;
 #include <stdexcept>
 #include <sstream>
 #include <fstream>
-#include <thread> //Multithreading
+#include <pthread.h> //Multithreading
 class NeuralNet
 {
 private:

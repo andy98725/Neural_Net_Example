@@ -166,9 +166,9 @@ NeuralNet::backprop (vector<Matrix> ins, vector<Matrix> outs, float delta)
   //clear error matricies
   resetErrors ();
 
+
   //TODO: Finish setting up backpropogation multithreading.
   //Init threads
-
   //Loop through each data point and thread the bacpropogation (TODO)
   for (unsigned int i = 0; i < ins.size (); ++i)
     {
