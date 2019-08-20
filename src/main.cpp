@@ -11,42 +11,64 @@
  *	3. Train neural net with matrix vectors
  *	4. Evaluate with input matrixW
  */
+
 #include <iostream>
 #include <vector>
 
-
 #include "import.h"
-#include "export.h"
 #include "math/Matrix.h"
 #include "NN/NeuralNet.h"
+
 using namespace std;
 
-void trainFromData(NeuralNet&);
-int main(){
-  //Load NN from file
-  NeuralNet baby("NNets/beginnerNet.nn");
+// Test method
+void test();
+// basic NN training method
+void basicTrain();
 
-  cout << "Initiated net.\n";
-  //Sample evaluation
-  Matrix out = baby.eval(Matrix{{0,0}});
-  cout << "Pre eval at 0,0:\n" << out;
-  cout << "Training net...\n";
-  //Training function
-  trainFromData(baby);
-  //Sample evaluation
-  out = baby.eval(Matrix{{0,0}});
-  cout << "Post eval at 0,0:\n" << out;
-  //Save work
-  baby.saveto("NNets/beginnerNet.nn");
-  //Generate image
-  //FileWriter ex(469,376, baby, "out.txt");
-  return 0;
+// Use data
+void trainFromData(NeuralNet&);
+int main() {
+	// Test funct
+	cout << "Entering " << endl;
+	test();
+	cout << "Ending" << endl;
+	return 0;
 }
-void trainFromData(NeuralNet &net){
-  //Read data from file
-  FileReader import("training.txt");
-  cout << "Loaded training data.\nBeginning training...\n";
-  //Train network
-  net.train(import.getInputs(),import.getOutputs());
-  cout << "Training complete.\n";
+
+void test() {
+	Matrix a(1, 3, new float[3] { 2, 3, 2 });
+	cout << "A " << a;
+
+	NeuralNet net(3, 1, 6, 2);
+	Matrix res = net.eval(a);
+	cout << "Result: " << res << endl;
+}
+
+void basicTrain() {
+	//Load NN from file
+	NeuralNet baby("NNets/beginnerNet.nn");
+
+	cout << "Initiated net.\n";
+	//Sample evaluation
+	Matrix out = baby.eval(Matrix { { 0, 0 } });
+	cout << "Pre eval at 0,0:\n" << out;
+	cout << "Training net...\n";
+	//Training function
+	trainFromData(baby);
+	//Sample evaluation
+	out = baby.eval(Matrix { { 0, 0 } });
+	cout << "Post eval at 0,0:\n" << out;
+	//Save work
+	baby.saveto("NNets/beginnerNet.nn");
+	//Generate image
+	//FileWriter ex(469,376, baby, "out.txt");
+}
+void trainFromData(NeuralNet &net) {
+	//Read data from file
+	FileReader import("training.txt");
+	cout << "Loaded training data.\nBeginning training...\n";
+	//Train network
+	net.train(import.getInputs(), import.getOutputs());
+	cout << "Training complete.\n";
 }

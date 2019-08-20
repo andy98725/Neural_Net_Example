@@ -5,224 +5,205 @@
  *      Author: Andy
  */
 
+using namespace std;
 
 #include "Matrix.h"
 
-
-using namespace std;
 //Default/dimension constructor
-Matrix::Matrix (unsigned int r, unsigned int c, float v)
-{
-  this->r = r;
-  this->c = c;
-  for(unsigned int i = 0; i < r*c; i++){
-      arr.push_back(v);
-  }
-
+Matrix::Matrix(unsigned int r, unsigned int c, float v) {
+	this->r = r;
+	this->c = c;
+	this->arr = new float[r * c];
+	for (unsigned int i = 0; i < r * c; i++) {
+		arr[i] = v;
+	}
 
 }
 //Array constructor
-Matrix::Matrix(int r, int c, float* temparr){
-  this->r = r;
-  this->c = c;
-  for(int i = 0; i < r*c; ++i){
-      arr.push_back(temparr[i]);
-  }
+Matrix::Matrix(int r, int c, float* arr) {
+	this->r = r;
+	this->c = c;
+	this->arr = arr;
 }
 //Copy constructor
-Matrix::Matrix(const Matrix& m){
-  this->r = m.r;
-  this->c = m.c;
-  for(unsigned int i = 0; i < r*c; i++){
-      arr.push_back(m.arr[i]);
-  }
+Matrix::Matrix(const Matrix& m) {
+	this->r = m.r;
+	this->c = m.c;
+	this->arr = new float[r * c];
 
-}
-//Bracket constructor
-Matrix::Matrix(initializer_list<initializer_list<float>> l){
-  r = l.size();
-  c = l.begin()->size();
-  for(initializer_list<float> ll : l){
-      for(float v : ll){
-      arr.push_back(v);
-      }
-  }
-  //Catch poorly structured lists
-  if(arr.size() != r*c){
-      throw invalid_argument("matrix poorly constructed: mismatched initialization lists.");
-  }
+	for (unsigned int i = 0; i < r * c; i++) {
+		arr[i] = m.arr[i];
+	}
+
 }
 //Destructor
-Matrix::~Matrix ()
-{
-  arr.clear();
+Matrix::~Matrix() {
+	delete arr;
 }
 //get dimensions
-unsigned int Matrix::getr(){
-  return r;
+unsigned int Matrix::getr() {
+	return r;
 }
-unsigned int Matrix::getc(){
-  return c;
+unsigned int Matrix::getc() {
+	return c;
 }
 //get values
-float Matrix::get(unsigned int row, unsigned int col){
-  //Catch out of bounds
-  if(row < 0 || col < 0 || row >= r || col >= c){
-      string vals = "Index "+to_string(row)+','+to_string(col)+" called on matrix size of "+to_string(r)+','+to_string(c)+'.';
-      throw invalid_argument( "matrix get function called out of range: " + vals );
-  }
-  return arr[row*c+col];
+float Matrix::get(unsigned int row, unsigned int col) {
+	//Catch out of bounds
+	if (row < 0 || col < 0 || row >= r || col >= c) {
+		string vals = "Index " + to_string(row) + ',' + to_string(col)
+				+ " called on matrix size of " + to_string(r) + ','
+				+ to_string(c) + '.';
+		throw invalid_argument(
+				"matrix get function called out of range: " + vals);
+	}
+	return arr[row * c + col];
 }
 //set
-void Matrix::set(unsigned int row, unsigned int col, float v){
-  //Catch out of bounds
-  if(row < 0 || col < 0 || row >= r || col >= c){
-      string vals = "Index "+to_string(row)+','+to_string(col)+" called on matrix size of "+to_string(r)+','+to_string(c)+'.';
-      throw invalid_argument( "matrix set function called out of range: " + vals );
-  }
-  arr[row*c+col] = v;
+void Matrix::set(unsigned int row, unsigned int col, float v) {
+	//Catch out of bounds
+	if (row < 0 || col < 0 || row >= r || col >= c) {
+		string vals = "Index " + to_string(row) + ',' + to_string(col)
+				+ " called on matrix size of " + to_string(r) + ','
+				+ to_string(c) + '.';
+		throw invalid_argument(
+				"matrix set function called out of range: " + vals);
+	}
+	arr[row * c + col] = v;
 }
 //transpose
-Matrix Matrix::transpose(){
-  float* tr = new float[r*c];
-  for(unsigned int i = 0; i < r; i++){
-      for(unsigned int j = 0; j < c; j++){
-	  tr[i*c+j] = arr[j*r + i];
-      }
-  }
-  return Matrix(c, r, tr);
+void Matrix::transpose() {
+	float* tr = new float[r * c];
+	for (unsigned int i = 0; i < r; i++) {
+		for (unsigned int j = 0; j < c; j++) {
+			tr[i * c + j] = arr[j * r + i];
+		}
+	}
+	// Update existing
+	delete arr;
+	arr = tr;
 }
 //String output
-string Matrix::getString(){
-  string ret = "{";
-  for(unsigned int i = 0; i < r; i++){
-      ret += '{';
-      for(unsigned int j = 0; j < c; j++){
-	  ret += to_string(arr[i*c+j]);
-	  if(j+1 < c) ret += ", ";
-      }
-      ret += '}';
-      if(i+1 < r) ret += ",\n";
-  }
-  ret += "}\n";
-  return ret;
+string Matrix::getString() {
+	string ret = "{";
+	for (unsigned int i = 0; i < r; i++) {
+		ret += '{';
+		for (unsigned int j = 0; j < c; j++) {
+			ret += to_string(arr[i * c + j]);
+			if (j + 1 < c)
+				ret += ", ";
+		}
+		ret += '}';
+		if (i + 1 < r)
+			ret += ",\n";
+	}
+	ret += "}\n";
+	return ret;
 }
 //String output
-ostream &operator<<(ostream& os, Matrix& r){
-  os << r.getString();
-  return os;
+ostream &operator<<(ostream& os, Matrix& r) {
+	os << r.getString();
+	return os;
 }
 
-//Operator overload
-Matrix Matrix::operator + (const Matrix& m) const{
-  if(r != m.r || c != m.c){
-      string vals = "matrix of dimensions "+to_string(r)+','+to_string(c)+" mismatched with matrix of dimensions "+to_string(m.r)+','+to_string(m.c)+'.';
-      throw invalid_argument("mismatched matricies add failure: " + vals);
-  }
-  float* add = new float[r*c];
-  for(unsigned int i = 0; i < r*c; i++){
-      add[i] = arr[i] + m.arr[i];
-  }
-  return Matrix(r, c, add);
-
+// Matrix operators
+void Matrix::operator+=(const Matrix& m) {
+	if (r != m.r || c != m.c) {
+		string vals = "matrix of dimensions " + to_string(r) + ','
+				+ to_string(c) + " mismatched with matrix of dimensions "
+				+ to_string(m.r) + ',' + to_string(m.c) + '.';
+		throw invalid_argument("mismatched matricies add failure: " + vals);
+	}
+	// Add other matrix values
+	for (unsigned int i = 0; i < r * c; i++) {
+		arr[i] += m.arr[i];
+	}
 }
-Matrix Matrix::operator - (const Matrix& m) const{
-  if(r != m.r || c != m.c){
-      string vals = "matrix of dimensions "+to_string(r)+','+to_string(c)+" mismatched with matrix of dimensions "+to_string(m.r)+','+to_string(m.c)+'.';
-      throw invalid_argument("mismatched matricies subtract failure: " + vals);
-  }
-  float* sub = new float[r*c];
-  for(unsigned int i = 0; i < r*c; i++){
-      sub[i] = arr[i] - m.arr[i];
-  }
-  return Matrix(r, c, sub);
-
+void Matrix::operator-=(const Matrix& m) {
+	if (r != m.r || c != m.c) {
+		string vals = "matrix of dimensions " + to_string(r) + ','
+				+ to_string(c) + " mismatched with matrix of dimensions "
+				+ to_string(m.r) + ',' + to_string(m.c) + '.';
+		throw invalid_argument(
+				"mismatched matricies subtract failure: " + vals);
+	}
+	// Subtract other matrix values
+	for (unsigned int i = 0; i < r * c; i++) {
+		arr[i] -= m.arr[i];
+	}
 }
-Matrix Matrix::operator * (float m) const{
-  float* mult = new float[r*c];
-  for(unsigned int i = 0; i < r*c; i++){
-      mult[i] = arr[i] * m;
-  }
-  return Matrix(r, c, mult);
-
+void Matrix::operator*=(float m) {
+	for (unsigned int i = 0; i < r * c; i++) {
+		arr[i] *= m;
+	}
 }
-Matrix Matrix::operator / (float d) const{
-  if(d == 0) throw invalid_argument("Operation error: cannot divide matrix by 0");
-  float* div = new float[r*c];
-  for(unsigned int i = 0; i < r*c; i++){
-      div[i] = arr[i] / d;
-  }
-  return Matrix(r, c, div);
-
+void Matrix::operator/=(float d) {
+	for (unsigned int i = 0; i < r * c; i++) {
+		arr[i] /= d;
+	}
 }
 //Dot product
-Matrix Matrix::operator * (const Matrix& m) const{
-  if(c != m.r){
-      string vals = "matrix of dimensions "+to_string(r)+','+to_string(c)+" mismatched with matrix of dimensions "+to_string(m.r)+','+to_string(m.c)+'.';
-      throw invalid_argument("mismatched matricies dot product failure: " + vals);
-  }
-  float *prod = new float[r*m.c];
-  for(unsigned int i = 0; i < r; i++){
-      for(unsigned int j = 0; j < m.c; j++){
-	  prod[i*m.c+j] = 0;
-	  for(unsigned int k = 0; k < c; k++){
-	      prod[i*m.c+j] += arr[i*c+k] * m.arr[k*m.c+j];
-	  }
-      }
-  }
-  return Matrix(r, m.c, prod);
+void Matrix::operator *=(const Matrix& m) {
+	if (c != m.r) {
+		string vals = "matrix of dimensions " + to_string(r) + ','
+				+ to_string(c) + " mismatched with matrix of dimensions "
+				+ to_string(m.r) + ',' + to_string(m.c) + '.';
+		throw invalid_argument(
+				"mismatched matricies dot product failure: " + vals);
+	}
+	float *prod = new float[r * m.c];
+	for (unsigned int i = 0; i < r; i++) {
+		for (unsigned int j = 0; j < m.c; j++) {
+			prod[i * m.c + j] = 0;
+			for (unsigned int k = 0; k < c; k++) {
+				prod[i * m.c + j] += arr[i * c + k] * m.arr[k * m.c + j];
+			}
+		}
+	}
+	// Update
+	delete arr;
+	arr = prod;
+	c = m.c;
 }
 //Hadamard product
-Matrix Matrix::operator % (const Matrix& m) const{
-  if(r != m.r || c != m.c){
-      string vals = "matrix of dimensions "+to_string(r)+','+to_string(c)+" mismatched with matrix of dimensions "+to_string(m.r)+','+to_string(m.c)+'.';
-      throw invalid_argument("mismatched matricies hadamard failure: " + vals);
-  }
-  float* had = new float[r*c];
-  for(unsigned int i = 0; i < r*c; i++){
-      had[i] = arr[i] * m.arr[i];
-  }
-  return Matrix(r, c, had);
-
+void Matrix::operator %=(const Matrix& m) {
+	if (r != m.r || c != m.c) {
+		string vals = "matrix of dimensions " + to_string(r) + ','
+				+ to_string(c) + " mismatched with matrix of dimensions "
+				+ to_string(m.r) + ',' + to_string(m.c) + '.';
+		throw invalid_argument(
+				"mismatched matricies hadamard failure: " + vals);
+	}
+	for (unsigned int i = 0; i < r * c; i++) {
+		arr[i] *= m.arr[i];
+	}
 }
 //Function application
-Matrix Matrix::apply(float (*func)(float)){
-  float* out = new float[r*c];
-  for(unsigned int i = 0; i < r*c; i++){
-      out[i] = func(arr[i]);
-  }
-  return Matrix(r, c, out);
+void Matrix::apply(float (*func)(float)) {
+	for (unsigned int i = 0; i < r * c; i++) {
+		arr[i] = func(arr[i]);
+	}
 }
-//Initiate from stream
-Matrix::Matrix(string in){
-  stringstream read(in);
-  r = 0;
-  c = 0;
-  read >> r;
-  read >> c;
-  for(unsigned int i = 0; i < r*c; ++i){
-      float in;
-      read >> in;
-      arr.push_back(in);
-  }
+// String constructor
+Matrix::Matrix(string in) {
+	stringstream read(in);
+	r = 0;
+	c = 0;
+	read >> r;
+	read >> c;
+	arr = new float[r * c];
+	for (unsigned int i = 0; i < r * c; ++i) {
+		float in;
+		read >> in;
+		arr[i] = in;
+	}
 }
-//Read from string
-void Matrix::read(string inp){
-  arr.clear();
-  stringstream read(inp);
-  read >> r >> c;
-  for(unsigned int i = 0; i < r*c; ++i){
-      float in;
-      read >> in;
-      arr.push_back(in);
-  }
-}
-//Write to string
-string Matrix::write(){
-  stringstream ret;
-  ret << r << ' ' << c ;
-  for(unsigned int i = 0; i < r*c; ++i){
-      ret << ' ' << arr[i];
-  }
-  return ret.str();
+// Write to string
+string Matrix::write() {
+	stringstream ret;
+	ret << r << ' ' << c;
+	for (unsigned int i = 0; i < r * c; ++i) {
+		ret << ' ' << arr[i];
+	}
+	return ret.str();
 }

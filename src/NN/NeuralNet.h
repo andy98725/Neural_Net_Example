@@ -14,40 +14,38 @@ using namespace std;
 #include <stdexcept>
 #include <sstream>
 #include <fstream>
-#include <pthread.h> //Multithreading
-class NeuralNet
-{
+class NeuralNet {
 private:
-  int layers;
-  int inCount, outCount, hidCount;
-  vector<Matrix> weights;
-  vector<Matrix> bases;
-  vector<Matrix> values;
-  vector<Matrix> activations;
-  vector<Matrix> weightsError;
-  vector<Matrix> basesError;
-  void resetEval();
-  void resetErrors();
-  void backpropCase(Matrix in, Matrix out);
+	int layers;
+	int inCount, outCount, hidCount;
+	// Net constants
+	vector<Matrix> weights;
+	vector<Matrix> bases;
+	// Evaluations
+	vector<Matrix> values;
+	vector<Matrix> activations;
+	// Learning
+	vector<Matrix> weightsError;
+	vector<Matrix> basesError;
+	void resetEval();
+	void resetErrors();
+	void backpropCase(Matrix in, Matrix out, float);
 public:
-  //Declare randomized/ "new" neural net
-  NeuralNet (int inCount, int outCount, int hiddenCount, int layers);
-  //Load from file
-  NeuralNet (string);
-  //Destructor
-  virtual
-  ~NeuralNet ();
-  //Evaluate input
-  Matrix eval(Matrix);
-  //Generic "Train". Set to whatever the developer thinks fits
-  void train(vector<Matrix>, vector<Matrix>);
-  //Backpropogation is the base learning method
-  void backprop(vector<Matrix>, vector<Matrix>, float);
-  //Training method of selection sampling
-  void escelate(vector<Matrix>, vector<Matrix>, int);
+	//Declare randomized/ "new" neural net
+	NeuralNet(int inCount, int outCount, int hiddenCount, int layers);
+	//Load from file
+	NeuralNet(string);
+	//Evaluate input
+	Matrix eval(Matrix);
+	//Generic "Train". Set to whatever the developer thinks fits
+	void train(vector<Matrix>, vector<Matrix>);
+	//Backpropogation is the base learning method
+	void backprop(vector<Matrix>, vector<Matrix>, float);
+	//Training method of selection sampling
+	void escelate(vector<Matrix>, vector<Matrix>, int);
 
-  //Save neural net's current state to file
-  void saveto (string);
+	//Save neural net's current state to file
+	void saveto(string);
 };
 
 #endif /* NEURALNET_H_ */
