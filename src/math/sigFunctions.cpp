@@ -7,7 +7,7 @@
 
 #include "sigFunctions.h"
 
-float sigmoid(float in){
+double sigmoid(double in){
   return 1 / (1 + exp (-in));
 }
 
@@ -15,7 +15,7 @@ float sigmoid(float in){
 //  return sigmoid(in) * (1-sigmoid(in));
 //} Same as below
 
-float sigmoidPrime(float in){
+double sigmoidPrime(double in){
 	return exp(-in) / pow(1+exp(-in),2);
 }
 

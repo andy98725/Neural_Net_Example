@@ -1,14 +1,13 @@
 
-PImage product;
+final boolean convertImg = false;
 final boolean dispOutFile = true;
-final boolean convertSize = false;
-final boolean isInt = false;
-final int conversionRate = 255;
 void setup() {
   size(200, 200);
-  convertTraining("/training.png", "../training.txt");
+  if(convertImg){
+  convertTraining("/training.png", "../input/training.txt");
+  }
   if (dispOutFile) {
-    product = convertImage("../out.txt");
+    product = convertImage("../output/out2.txt");
     surface.setResizable(true);
     surface.setSize(product.width, product.height);
   }
@@ -18,6 +17,11 @@ void draw() {
   if (dispOutFile)
     image(product, 0, 0);
 }
+
+PImage product;
+final boolean convertSize = false;
+final boolean isInt = false;
+final int conversionRate = 255;
 
 void convertTraining(String filename, String savename) {
   PImage convert = loadImage(filename);

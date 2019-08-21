@@ -14,16 +14,17 @@ using namespace std;
 #include <iostream> //cout (bugtesting)
 #include <sstream> //stringstream (read, write)
 #include <vector> //vector arr (data)
+#include <math.h> // isnan
 
 class Matrix {
 private:
 	unsigned int r, c;
-	float* arr;
+	double* arr;
 public:
 	//Default/Dimension constructor
-	Matrix(unsigned int r, unsigned int c, float v);
+	Matrix(unsigned int r, unsigned int c, double v);
 	//Array initializer
-	Matrix(int, int, float*);
+	Matrix(int, int, double*);
 	//Copy constructor
 	Matrix(const Matrix&);
 	//String constructor
@@ -35,9 +36,9 @@ public:
 	unsigned int getr();
 	unsigned int getc();
 	//Get value
-	float get(unsigned int, unsigned int);
+	double get(unsigned int, unsigned int);
 	//Set value
-	void set(unsigned int, unsigned int, float);
+	void set(unsigned int, unsigned int, double);
 	//Transpose
 	void transpose();
 	//Readable output
@@ -49,16 +50,19 @@ public:
 	Matrix operator*(const Matrix&) const;
 	void operator%=(const Matrix&); //Hadamard product
 
-	void operator*=(const float); //Scalar mult
-	void operator/=(const float); //Scalar divide
+	void operator*=(const double); //Scalar mult
+	void operator/=(const double); //Scalar divide
 
 	//Matrixwise apply function
-	void apply(float (*)(float));
+	void apply(double (*)(double));
 
 	//Save to string
 	string write();
 };
 //Output
 ostream &operator<<(ostream&, Matrix&);
+
+// Contains a bad value?
+bool containsNaN(Matrix&);
 
 #endif /* MATRIX_H_ */

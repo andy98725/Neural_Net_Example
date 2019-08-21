@@ -8,6 +8,7 @@
 #include "NeuralNet.h"
 
 #include <cstdlib>
+#include <iostream>
 #include <string>
 
 using namespace std;
@@ -28,7 +29,8 @@ NeuralNet::NeuralNet(int inCount, int outCount, int hiddenCount, int layers) {
 		if (i == layers - 1) {
 			cols = outCount;
 		}
-		float* weightarr = new float[rows * cols], *basearr = new float[cols];
+		double* weightarr = new double[rows * cols],
+				*basearr = new double[cols];
 		for (int j = 0; j < rows * cols; ++j) {
 			// Get random 0-1
 			double r = (double) rand() / (RAND_MAX);
@@ -39,7 +41,7 @@ NeuralNet::NeuralNet(int inCount, int outCount, int hiddenCount, int layers) {
 			// Get random 0-1
 			double r = (double) rand() / (RAND_MAX);
 			// Scale to min/max
-			basearr[j] = 1 - (r * (MAX_BASE - MIN_BASE)) + MIN_BASE;
+			basearr[j] = (r * (MAX_BASE - MIN_BASE)) + MIN_BASE;
 		}
 		Matrix w(rows, cols, weightarr), b(1, cols, basearr);
 		weights.push_back(w);
@@ -84,7 +86,7 @@ void NeuralNet::resetErrors() {
 		Matrix m = weights[i];
 		r = m.getr();
 		c = m.getc();
-		float* weightarr = new float[r * c], *basearr = new float[c];
+		double* weightarr = new double[r * c], *basearr = new double[c];
 		for (unsigned int j = 0; j < r * c; ++j) {
 			weightarr[j] = 0;
 		}
@@ -97,7 +99,7 @@ void NeuralNet::resetErrors() {
 }
 
 // Single backpropogation case
-void NeuralNet::backpropCase(Matrix in, Matrix expectedOut, float delta) {
+void NeuralNet::backpropCase(Matrix in, Matrix expectedOut, double delta) {
 	//Make case errrors matching weight and base error matricies
 	vector<Matrix> caseWeightError, caseBaseError;
 	for (int i = 0; i < layers; ++i) {
@@ -108,7 +110,8 @@ void NeuralNet::backpropCase(Matrix in, Matrix expectedOut, float delta) {
 		if (i == layers - 1) {
 			cols = outCount;
 		}
-		float* weightarr = new float[rows * cols], *basearr = new float[cols];
+		double* weightarr = new double[rows * cols],
+				*basearr = new double[cols];
 		for (int j = 0; j < rows * cols; ++j) {
 			weightarr[j] = 0;
 		}
@@ -127,8 +130,8 @@ void NeuralNet::backpropCase(Matrix in, Matrix expectedOut, float delta) {
 		// Final layer is different
 		if (layer == layers - 1) {
 			// Error is difference between output and expected
-			layerError = new Matrix(expectedOut);
-			*layerError -= output;
+			layerError = new Matrix(output);
+			*layerError -= expectedOut;
 			// Scale by delta
 			*layerError *= delta;
 		} else {
@@ -162,7 +165,8 @@ void NeuralNet::backpropCase(Matrix in, Matrix expectedOut, float delta) {
 		weightsError[j] += caseWeightError[j];
 	}
 }
-void NeuralNet::backprop(vector<Matrix> ins, vector<Matrix> outs, float delta) {
+void NeuralNet::backprop(vector<Matrix> ins, vector<Matrix> outs,
+		double delta) {
 	//Evaluate and backpropogate through each and every data set.
 	//Once done, alter weights and biases according to average error.
 
@@ -174,6 +178,8 @@ void NeuralNet::backprop(vector<Matrix> ins, vector<Matrix> outs, float delta) {
 		throw invalid_argument(
 				"Backprop failure: Mismatched input and output vectors.");
 	}
+	// Normalize for size
+	delta /= ins.size();
 	//clear error matricies
 	resetErrors();
 
@@ -186,40 +192,50 @@ void NeuralNet::backprop(vector<Matrix> ins, vector<Matrix> outs, float delta) {
 		// Normalize for sizes
 //		weightsError[i] *= (1.0 / ins.size());
 		// Change
-		weights[i] += weightsError[i];
+		weights[i] -= weightsError[i];
 	}
 	for (unsigned int i = 0; i < bases.size(); ++i) {
 		// Normalize for sizes
 //		basesError[i] *= (1.0 / ins.size());
-		bases[i] += basesError[i];
+		bases[i] -= basesError[i];
 	}
 }
-void NeuralNet::escelate(vector<Matrix> ins, vector<Matrix> outs, int times) {
-	//Trains N times
-	for (int t = 0; t < times; ++t) {
-		vector<Matrix> inset, outset;
-		//Get 10 random test cases for each iteration that's happened, plus base 20 (escalating count)
-		for (int iter = 0; iter < 20 + t * 10; ++iter) {
-			//Choose a random from base set and add it
-			int index = rand() % ins.size();
-			inset.push_back(ins[index]);
-			outset.push_back(outs[index]);
-		}
-		//Now, backprop set with offset
-		float offset = 0.25 - (0.2 * t) / times; //Deescelating for accuracy
-		backprop(inset, outset, offset);
+void NeuralNet::batchTrain(vector<Matrix> ins, vector<Matrix> outs,
+		int batchSize, double delta) {
+	// Select subset of ins and outs
+	vector<Matrix> inset, outset;
+	// Add random cases from sample
+	for (int i = 0; i < batchSize; i++) {
+		//Choose a random from base set and add it
+		int index = rand() % ins.size();
+		inset.push_back(ins[index]);
+		outset.push_back(outs[index]);
 	}
+	// Backpropogate subset
+	backprop(inset, outset, delta);
 }
 void NeuralNet::train(vector<Matrix> ins, vector<Matrix> outs) {
-	// If size is > 100, escelate
+	// If size is > 100, do batch training
 	if (ins.size() > 100) {
-		for (int k = 0; k < 10; ++k) {
-			escelate(ins, outs, 10);
+		// Size of each batch
+		int batchSize = 50;
+		// How many times should it do it?
+		int trainingTimes = ins.size() / batchSize / 4;
+		// Do batch training that many times
+		for (int k = 0; k < trainingTimes; ++k) {
+			// Only do if mod 100
+			if ((k + 1) % 100 == 0) {
+				cout << "Training " << k + 1 << " of " << trainingTimes << "..."
+						<< endl;
+				cout.flush();
+			}
+			// Batch train, with delta starting at 1 and linearly approaching 0
+			batchTrain(ins, outs, batchSize, 1 - ((float) k) / trainingTimes);
 		}
 	} else {
-		// Just train off data
-		for (int k = 0; k < 500; ++k) {
-			backprop(ins, outs, 10);
+		// Just train off data (50,000 times total)
+		for (unsigned int k = 0; k < 50000 / ins.size(); ++k) {
+			backprop(ins, outs, 1);
 		}
 	}
 }

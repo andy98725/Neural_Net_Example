@@ -24,8 +24,8 @@ FileWriter::FileWriter(int w, int h, NeuralNet nn, string filename) :
 	//Generate data
 	for (int j = 0; j < h; ++j) {
 		for (int i = 0; i < w; ++i) {
-			Matrix out = nn.eval(Matrix(1, 2, new float[2] { (float) i,
-					(float) j }));
+			Matrix out = nn.eval(Matrix(1, 2, new double[2] { (double) i,
+					(double) j }));
 			file << i << ' ' << j << ' ' << out.get(0, 0) << ' '
 					<< out.get(0, 1) << ' ' << out.get(0, 2) << endl;
 		}

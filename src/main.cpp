@@ -13,24 +13,34 @@
  */
 
 #include <iostream>
+#include <string>
 #include <vector>
 
+#include "export.h"
 #include "import.h"
 #include "math/Matrix.h"
 #include "NN/NeuralNet.h"
 
 using namespace std;
 
+// Image sizes
+#define IMG_WID 469
+#define IMG_HEI 376
+
 // Test method
 void xorTest();
-// basic NN training method
-void basicTrain();
+// basic NN training methods
+void startTrain(string fileloc, int layers, int hiddenWid);
+void continueTrain(string fileloc, string filedest, string imgdest);
 
 // Use data
 void trainFromData(NeuralNet&);
 int main() {
-	// Test funct
-	xorTest();
+	// Basic train funct
+//	startTrain("NNets/sampleNet.nn", 8, 20);
+	continueTrain("NNets/sampleNet.nn", "NNets/continueNet.nn", "output/out2.txt");
+//	// Test funct
+//	xorTest();
 	cout << "Ending..." << endl;
 	cout.flush();
 	return 0;
@@ -38,12 +48,12 @@ int main() {
 
 void xorTest() {
 	// Dummy data
-	Matrix a(1, 2, new float[2] { 0, 0 });
-	Matrix b(1, 2, new float[2] { 0, 1 });
-	Matrix c(1, 2, new float[2] { 1, 0 });
-	Matrix d(1, 2, new float[2] { 1, 1 });
-	Matrix yes(1,1,new float[1]{1});
-	Matrix no(1,1,new float[1]{0});
+	Matrix a(1, 2, new double[2] { 0, 0 });
+	Matrix b(1, 2, new double[2] { 0, 1 });
+	Matrix c(1, 2, new double[2] { 1, 0 });
+	Matrix d(1, 2, new double[2] { 1, 1 });
+	Matrix yes(1, 1, new double[1] { 1 });
+	Matrix no(1, 1, new double[1] { 0 });
 
 	// Init basic net
 	NeuralNet net(2, 1, 4, 2); // @suppress("Ambiguous problem")
@@ -70,9 +80,8 @@ void xorTest() {
 	outs.push_back(yes);
 	ins.push_back(c);
 	outs.push_back(yes);
+
 	net.train(ins, outs);
-
-
 
 	// Result eval
 	Matrix resA = net.eval(a), resB = net.eval(b), resC = net.eval(c), resD =
@@ -86,30 +95,68 @@ void xorTest() {
 
 }
 
-void basicTrain() {
-	//Load NN from file
-	NeuralNet baby("NNets/beginnerNet.nn");
+void startTrain(string fileloc, int layers, int hiddenWid) {
+	// Make initial NN
+	NeuralNet net(2, 3, hiddenWid, layers);	// @suppress("Ambiguous problem")
+	cout << "Initiated net." << endl << "Making pre-image..." << endl;
+	cout.flush();
 
-	cout << "Initiated net.\n";
-	//Sample evaluation
-	Matrix out = baby.eval(Matrix { { 0, 0 } });
-	cout << "Pre eval at 0,0:\n" << out;
-	cout << "Training net...\n";
+	// Make image
+	FileWriter pre(IMG_WID, IMG_HEI, net, "preOut.txt");
+
+	// Train net
+	cout << "Image complete. Training net...\n";
+	cout.flush();
 	//Training function
-	trainFromData(baby);
-	//Sample evaluation
-	out = baby.eval(Matrix { { 0, 0 } });
-	cout << "Post eval at 0,0:\n" << out;
+	trainFromData(net);
+
 	//Save work
-	baby.saveto("NNets/beginnerNet.nn");
+	cout << "Saving net and making image..." << endl;
+	cout.flush();
+	net.saveto(fileloc);
 	//Generate image
-	//FileWriter ex(469,376, baby, "out.txt");
+	FileWriter ex(IMG_WID, IMG_HEI, net, "out.txt");
+
+}
+
+void continueTrain(string fileloc, string filedest, string imgdest) {
+	//Load NN from file
+	NeuralNet net(fileloc);
+	cout << "Initiated net.\n";
+
+	//Training function
+	trainFromData(net);
+	//Save work
+	cout << "Saving net and making image..." << endl;
+	cout.flush();
+	net.saveto(filedest);
+	//Generate image
+	FileWriter ex(IMG_WID, IMG_HEI, net, imgdest);
 }
 void trainFromData(NeuralNet &net) {
+	//Sample evaluations
+	Matrix out = net.eval(Matrix(1, 2, new double[2] { 0, 0 }));
+	cout << "Pre eval at 0, 0:" << endl << out;
+	Matrix out2 = net.eval(Matrix(1, 2, new double[2] { IMG_WID, IMG_HEI }));
+	cout << "Pre eval at " << IMG_WID << ", " << IMG_HEI << ":" << endl << out2;
+	cout << "Loading data...\n";
+	cout.flush();
+
 	//Read data from file
-	FileReader import("training.txt");
+	FileReader import("input/training.txt");
 	cout << "Loaded training data.\nBeginning training...\n";
+	cout.flush();
+
 	//Train network
 	net.train(import.getInputs(), import.getOutputs());
 	cout << "Training complete.\n";
+	cout.flush();
+	cout << net << endl;
+	cout.flush();
+
+	//Sample evaluation
+	Matrix out3 = net.eval(Matrix(1, 2, new double[2] { 0, 0 }));
+	cout << "Post eval at 0, 0:\n" << out3;
+	Matrix out4 = net.eval(Matrix(1, 2, new double[2] { IMG_WID, IMG_HEI }));
+	cout << "Post eval at " << IMG_WID << ", " << IMG_HEI << ":" << endl << out4;
 }

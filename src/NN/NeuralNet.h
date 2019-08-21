@@ -24,12 +24,18 @@ private:
 	// Evaluations
 	vector<Matrix> values;
 	vector<Matrix> activations;
+	// Clear evaluations
+	void resetEval();
 	// Learning
 	vector<Matrix> weightsError;
 	vector<Matrix> basesError;
-	void resetEval();
+	// Clear errors
 	void resetErrors();
-	void backpropCase(Matrix in, Matrix out, float);
+
+	// Single back propogation
+	void backpropCase(Matrix in, Matrix out, double);
+	//Training method of selection sampling
+	void batchTrain(vector<Matrix>, vector<Matrix>, int, double);
 public:
 	//Declare randomized/ "new" neural net
 	NeuralNet(int inCount, int outCount, int hiddenCount, int layers);
@@ -40,9 +46,7 @@ public:
 	//Generic "Train". Set to whatever the developer thinks fits
 	void train(vector<Matrix>, vector<Matrix>);
 	//Backpropogation is the base learning method
-	void backprop(vector<Matrix>, vector<Matrix>, float);
-	//Training method of selection sampling
-	void escelate(vector<Matrix>, vector<Matrix>, int);
+	void backprop(vector<Matrix>, vector<Matrix>, double);
 
 	//Readable output
 	std::string toString();
