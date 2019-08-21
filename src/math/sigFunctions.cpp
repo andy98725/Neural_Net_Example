@@ -8,12 +8,14 @@
 #include "sigFunctions.h"
 
 float sigmoid(float in){
-  return 1 / (1 + exp (in));
+  return 1 / (1 + exp (-in));
 }
+
+//float sigmoidPrime(float in){
+//  return sigmoid(in) * (1-sigmoid(in));
+//} Same as below
 
 float sigmoidPrime(float in){
-  return sigmoid(in) * (1-sigmoid(in));
+	return exp(-in) / pow(1+exp(-in),2);
 }
-
-
 

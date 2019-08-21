@@ -127,8 +127,6 @@ void NeuralNet::backpropCase(Matrix in, Matrix expectedOut, float delta) {
 		// Final layer is different
 		if (layer == layers - 1) {
 			// Error is difference between output and expected
-//			layerError = new Matrix(output);
-//			*layerError -= expectedOut;
 			layerError = new Matrix(expectedOut);
 			*layerError -= output;
 			// Scale by delta
@@ -221,7 +219,7 @@ void NeuralNet::train(vector<Matrix> ins, vector<Matrix> outs) {
 	} else {
 		// Just train off data
 		for (int k = 0; k < 500; ++k) {
-			backprop(ins, outs, 1);
+			backprop(ins, outs, 10);
 		}
 	}
 }

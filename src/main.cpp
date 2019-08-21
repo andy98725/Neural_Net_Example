@@ -63,12 +63,13 @@ void xorTest() {
 	vector<Matrix> ins, outs;
 	ins.push_back(a);
 	outs.push_back(no);
-//	ins.push_back(b); TODO: Restore full training data
-//	outs.push_back(yes);
-//	ins.push_back(c);
-//	outs.push_back(yes);
 	ins.push_back(d);
 	outs.push_back(no);
+
+	ins.push_back(b);
+	outs.push_back(yes);
+	ins.push_back(c);
+	outs.push_back(yes);
 	net.train(ins, outs);
 
 
