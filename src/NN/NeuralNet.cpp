@@ -17,26 +17,33 @@ NeuralNet::NeuralNet(int inCount, int outCount, int hiddenCount, int layers) {
 	this->inCount = inCount;
 	this->outCount = outCount;
 	this->hidCount = hiddenCount;
-	//weights = new Matrix[layers];
+	// Sizes
+	int MAX_WEIGHT = 1, MIN_WEIGHT = -1;
+	int MAX_BASE = 1, MIN_BASE = -1;
 	for (int i = 0; i < layers; ++i) {
 		int rows = hidCount, cols = hidCount;
-		if (i == 0)
+		if (i == 0) {
 			rows = inCount;
-		if (i == layers - 1)
+		}
+		if (i == layers - 1) {
 			cols = outCount;
+		}
 		float* weightarr = new float[rows * cols], *basearr = new float[cols];
 		for (int j = 0; j < rows * cols; ++j) {
-			weightarr[j] = (double) rand() / (RAND_MAX); //0 to 1
-//	  weightarr[j] = 1 - ((double) rand () / (RAND_MAX)) * 2; //-1 to 1
+			// Get random 0-1
+			double r = (double) rand() / (RAND_MAX);
+			// Scale to min/max
+			weightarr[j] = (r * (MAX_WEIGHT - MIN_WEIGHT)) + MIN_WEIGHT;
 		}
 		for (int j = 0; j < cols; ++j) {
-			basearr[j] = 1 - ((double) rand() / (RAND_MAX)) * 2; //-1 to 1
+			// Get random 0-1
+			double r = (double) rand() / (RAND_MAX);
+			// Scale to min/max
+			basearr[j] = 1 - (r * (MAX_BASE - MIN_BASE)) + MIN_BASE;
 		}
 		Matrix w(rows, cols, weightarr), b(1, cols, basearr);
 		weights.push_back(w);
 		bases.push_back(b);
-		delete weightarr;
-		delete basearr;
 	}
 
 }
@@ -50,7 +57,7 @@ Matrix NeuralNet::eval(Matrix in) {
 	for (int i = 0; i < layers; ++i) {
 		// Get matrix to transform
 		Matrix t = Matrix(activations.back());
-		// Multiply by weights then add bases
+		// weights dot value + bases
 		t *= weights[i];
 		t += bases[i];
 		// Add to values
@@ -95,10 +102,12 @@ void NeuralNet::backpropCase(Matrix in, Matrix expectedOut, float delta) {
 	vector<Matrix> caseWeightError, caseBaseError;
 	for (int i = 0; i < layers; ++i) {
 		int rows = hidCount, cols = hidCount;
-		if (i == 0)
+		if (i == 0) {
 			rows = inCount;
-		if (i == layers - 1)
+		}
+		if (i == layers - 1) {
 			cols = outCount;
+		}
 		float* weightarr = new float[rows * cols], *basearr = new float[cols];
 		for (int j = 0; j < rows * cols; ++j) {
 			weightarr[j] = 0;
@@ -118,17 +127,20 @@ void NeuralNet::backpropCase(Matrix in, Matrix expectedOut, float delta) {
 		// Final layer is different
 		if (layer == layers - 1) {
 			// Error is difference between output and expected
-			layerError = new Matrix(output);
-			*layerError -= expectedOut;
+//			layerError = new Matrix(output);
+//			*layerError -= expectedOut;
+			layerError = new Matrix(expectedOut);
+			*layerError -= output;
 			// Scale by delta
-			*layerError /= delta;
+			*layerError *= delta;
 		} else {
 			// Get base error of next layer
-			layerError = new Matrix(caseBaseError[layer + 1]);
-			// Dot product the weights of the next layer
-			layerError->transpose();
-			*layerError *= weights[layer + 1];
-			layerError->transpose();
+			// Dot product the weights of the next layer with the base error of the next layer
+			weights[layer + 1].transpose();
+			layerError = new Matrix(
+					caseBaseError[layer + 1] * weights[layer + 1]);
+			weights[layer + 1].transpose();
+//			layerError->transpose();
 
 		}
 
@@ -141,14 +153,13 @@ void NeuralNet::backpropCase(Matrix in, Matrix expectedOut, float delta) {
 		//The error of the base is actually equal to the layer's error
 		caseBaseError[layer] = *layerError;
 		//And the weight error is the previous layer's activations transposed dot the layer's error
-		Matrix weightErr = Matrix(activations[layer]);
-		weightErr.transpose();
-		weightErr *= *layerError;
-		caseWeightError[layer] = weightErr;
+		Matrix* weightErr = new Matrix(activations[layer]);
+		weightErr->transpose();
+		*weightErr *= *layerError;
+		caseWeightError[layer] = *weightErr;
 	}
 	//Done backpropogating. Apply case to total and finish.
 	for (int j = 0; j < layers; ++j) {
-		//TODO; I think I need to rewrite this to include delta change.
 		basesError[j] += caseBaseError[j];
 		weightsError[j] += caseWeightError[j];
 	}
@@ -175,12 +186,13 @@ void NeuralNet::backprop(vector<Matrix> ins, vector<Matrix> outs, float delta) {
 	resetEval();
 	for (unsigned int i = 0; i < weights.size(); ++i) {
 		// Normalize for sizes
-		weightsError[i] *= (1.0 / ins.size());
+//		weightsError[i] *= (1.0 / ins.size());
 		// Change
 		weights[i] += weightsError[i];
 	}
 	for (unsigned int i = 0; i < bases.size(); ++i) {
-		basesError[i] *= (1.0 / ins.size());
+		// Normalize for sizes
+//		basesError[i] *= (1.0 / ins.size());
 		bases[i] += basesError[i];
 	}
 }
@@ -201,8 +213,16 @@ void NeuralNet::escelate(vector<Matrix> ins, vector<Matrix> outs, int times) {
 	}
 }
 void NeuralNet::train(vector<Matrix> ins, vector<Matrix> outs) {
-	for (int k = 0; k < 10; ++k) {
-		escelate(ins, outs, 10);
+	// If size is > 100, escelate
+	if (ins.size() > 100) {
+		for (int k = 0; k < 10; ++k) {
+			escelate(ins, outs, 10);
+		}
+	} else {
+		// Just train off data
+		for (int k = 0; k < 500; ++k) {
+			backprop(ins, outs, 1);
+		}
 	}
 }
 //Load from file
@@ -237,3 +257,31 @@ void NeuralNet::saveto(string filename) {
 	file.close();
 
 }
+
+//String output
+ostream &operator<<(ostream& os, NeuralNet& r) {
+	os << r.toString();
+	return os;
+}
+
+//String output
+string NeuralNet::toString() {
+	string ret = "[NET: Input Size: " + to_string(inCount);
+	ret += ", Output Size: " + to_string(outCount) + ";\n";
+	ret += "Layers: " + to_string(layers);
+	ret += ", Width: " + to_string(hidCount) + ";\n";
+	// Do matricies
+	ret += "Bases:\n";
+	for (unsigned int i = 0; i < bases.size(); ++i) {
+		ret += to_string(i) + ": " + bases[i].toString();
+	}
+	ret += "\nWeights:\n";
+	for (unsigned int i = 0; i < weights.size(); ++i) {
+		ret += to_string(i) + ": " + weights[i].toString();
+	}
+
+	// Done
+	ret += "]\n";
+	return ret;
+}
+

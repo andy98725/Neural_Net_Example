@@ -82,9 +82,12 @@ void Matrix::transpose() {
 	// Update existing
 	delete arr;
 	arr = tr;
+	int temp = r;
+	r = c;
+	c = temp;
 }
 //String output
-string Matrix::getString() {
+string Matrix::toString() {
 	string ret = "{";
 	for (unsigned int i = 0; i < r; i++) {
 		ret += '{';
@@ -102,7 +105,7 @@ string Matrix::getString() {
 }
 //String output
 ostream &operator<<(ostream& os, Matrix& r) {
-	os << r.getString();
+	os << r.toString();
 	return os;
 }
 
@@ -142,8 +145,29 @@ void Matrix::operator/=(float d) {
 		arr[i] /= d;
 	}
 }
-//Dot product
-void Matrix::operator *=(const Matrix& m) {
+// Dot product
+Matrix Matrix::operator*(const Matrix& m) const{
+	if (c != m.r) {
+		string vals = "matrix of dimensions " + to_string(r) + ','
+				+ to_string(c) + " mismatched with matrix of dimensions "
+				+ to_string(m.r) + ',' + to_string(m.c) + '.';
+		throw invalid_argument(
+				"mismatched matricies dot product failure: " + vals);
+	}
+	float *prod = new float[r * m.c];
+	for (unsigned int i = 0; i < r; i++) {
+		for (unsigned int j = 0; j < m.c; j++) {
+			prod[i * m.c + j] = 0;
+			for (unsigned int k = 0; k < c; k++) {
+				prod[i * m.c + j] += arr[i * c + k] * m.arr[k * m.c + j];
+			}
+		}
+	}
+	// Make new matrix
+	return Matrix(r, m.c, prod);
+}
+//Dot product locally
+void Matrix::operator*=(const Matrix& m) {
 	if (c != m.r) {
 		string vals = "matrix of dimensions " + to_string(r) + ','
 				+ to_string(c) + " mismatched with matrix of dimensions "

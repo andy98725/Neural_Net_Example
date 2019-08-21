@@ -41,11 +41,12 @@ public:
 	//Transpose
 	void transpose();
 	//Readable output
-	std::string getString();
+	std::string toString();
 	//Operator overloads
 	void operator+=(const Matrix&);
 	void operator-=(const Matrix&);
 	void operator*=(const Matrix&); //Dot product
+	Matrix operator*(const Matrix&) const;
 	void operator%=(const Matrix&); //Hadamard product
 
 	void operator*=(const float); //Scalar mult

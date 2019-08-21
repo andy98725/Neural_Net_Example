@@ -22,7 +22,7 @@
 using namespace std;
 
 // Test method
-void test();
+void xorTest();
 // basic NN training method
 void basicTrain();
 
@@ -30,19 +30,59 @@ void basicTrain();
 void trainFromData(NeuralNet&);
 int main() {
 	// Test funct
-	cout << "Entering " << endl;
-	test();
-	cout << "Ending" << endl;
+	xorTest();
+	cout << "Ending..." << endl;
+	cout.flush();
 	return 0;
 }
 
-void test() {
-	Matrix a(1, 3, new float[3] { 2, 3, 2 });
-	cout << "A " << a;
+void xorTest() {
+	// Dummy data
+	Matrix a(1, 2, new float[2] { 0, 0 });
+	Matrix b(1, 2, new float[2] { 0, 1 });
+	Matrix c(1, 2, new float[2] { 1, 0 });
+	Matrix d(1, 2, new float[2] { 1, 1 });
+	Matrix yes(1,1,new float[1]{1});
+	Matrix no(1,1,new float[1]{0});
 
-	NeuralNet net(3, 1, 6, 2);
-	Matrix res = net.eval(a);
-	cout << "Result: " << res << endl;
+	// Init basic net
+	NeuralNet net(2, 1, 4, 2); // @suppress("Ambiguous problem")
+	// Initial eval
+	Matrix preA = net.eval(a), preB = net.eval(b), preC = net.eval(c), preD =
+			net.eval(d);
+	cout << "Initial: " << endl;
+	// cout << "Net: " << net << endl;
+	cout << "0 0: " << preA;
+	cout << "0 1: " << preB;
+	cout << "1 0: " << preC;
+	cout << "1 1: " << preD;
+	// Update
+	cout.flush();
+
+	// Train with dummy data
+	vector<Matrix> ins, outs;
+	ins.push_back(a);
+	outs.push_back(no);
+//	ins.push_back(b); TODO: Restore full training data
+//	outs.push_back(yes);
+//	ins.push_back(c);
+//	outs.push_back(yes);
+	ins.push_back(d);
+	outs.push_back(no);
+	net.train(ins, outs);
+
+
+
+	// Result eval
+	Matrix resA = net.eval(a), resB = net.eval(b), resC = net.eval(c), resD =
+			net.eval(d);
+	cout << "Result: " << endl;
+	// cout << "Net: " << net << endl;
+	cout << "0 0: " << resA;
+	cout << "0 1: " << resB;
+	cout << "1 0: " << resC;
+	cout << "1 1: " << resD;
+
 }
 
 void basicTrain() {

@@ -44,8 +44,12 @@ public:
 	//Training method of selection sampling
 	void escelate(vector<Matrix>, vector<Matrix>, int);
 
+	//Readable output
+	std::string toString();
 	//Save neural net's current state to file
 	void saveto(string);
 };
+//Output
+ostream &operator<<(ostream&, NeuralNet&);
 
 #endif /* NEURALNET_H_ */
