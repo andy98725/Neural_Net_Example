@@ -37,11 +37,15 @@ void continueTrain(string fileloc, string filedest, string imgdest);
 void trainFromData(NeuralNet&);
 int main() {
 	// Basic train funct
-//	startTrain("NNets/sampleNet.nn", 8, 20);
-	continueTrain("NNets/sampleNet.nn", "NNets/continueNet.nn", "output/out2.txt");
+//	startTrain("NNets/biggerNet.nn", 14, 40);
+//	continueTrain("NNets/sampleNet.nn", "NNets/sampleNet.nn",
+//			"NNets/sampleOutput/postOut.txt");
+	continueTrain("NNets/biggerNet.nn", "NNets/biggerNet.nn",
+			"NNets/biggerOutput/postOut.txt");
+
 //	// Test funct
 //	xorTest();
-	cout << "Ending..." << endl;
+	cout << "Done." << endl;
 	cout.flush();
 	return 0;
 }
@@ -98,7 +102,7 @@ void xorTest() {
 void startTrain(string fileloc, int layers, int hiddenWid) {
 	// Make initial NN
 	NeuralNet net(2, 3, hiddenWid, layers);	// @suppress("Ambiguous problem")
-	cout << "Initiated net." << endl << "Making pre-image..." << endl;
+	cout << "Initiated net " << fileloc << endl << "Making pre-image..." << endl;
 	cout.flush();
 
 	// Make image
@@ -122,16 +126,24 @@ void startTrain(string fileloc, int layers, int hiddenWid) {
 void continueTrain(string fileloc, string filedest, string imgdest) {
 	//Load NN from file
 	NeuralNet net(fileloc);
-	cout << "Initiated net.\n";
+	cout << "Initiated net " << fileloc << endl;
 
 	//Training function
 	trainFromData(net);
-	//Save work
-	cout << "Saving net and making image..." << endl;
+	char save;
+	cout << "Save progress? (y/n): ";
 	cout.flush();
-	net.saveto(filedest);
-	//Generate image
-	FileWriter ex(IMG_WID, IMG_HEI, net, imgdest);
+	cin.clear();
+	cin >> save;
+
+	if (save != 'n' && save != 'N') {
+		//Save work
+		cout << "Saving net and making image..." << endl;
+		cout.flush();
+		net.saveto(filedest);
+		//Generate image
+		FileWriter ex(IMG_WID, IMG_HEI, net, imgdest);
+	}
 }
 void trainFromData(NeuralNet &net) {
 	//Sample evaluations
@@ -148,15 +160,28 @@ void trainFromData(NeuralNet &net) {
 	cout.flush();
 
 	//Train network
-	net.train(import.getInputs(), import.getOutputs());
+	int loopCount = 6;
+	for (int i = 1; i <= loopCount; i++) {
+		cout << endl << "Training " << i << " of " << loopCount << endl;
+		net.train(import.getInputs(), import.getOutputs());
+	}
+//	char loop = 'y';
+//	while (loop != 'n' && loop != 'N') {
+//		net.train(import.getInputs(), import.getOutputs());
+//
+//		cout << "Continue? (y/n): ";
+//		cout.flush();
+//		cin.clear();
+//		cin >> loop;
+//	}
+
 	cout << "Training complete.\n";
-	cout.flush();
-	cout << net << endl;
 	cout.flush();
 
 	//Sample evaluation
 	Matrix out3 = net.eval(Matrix(1, 2, new double[2] { 0, 0 }));
 	cout << "Post eval at 0, 0:\n" << out3;
 	Matrix out4 = net.eval(Matrix(1, 2, new double[2] { IMG_WID, IMG_HEI }));
-	cout << "Post eval at " << IMG_WID << ", " << IMG_HEI << ":" << endl << out4;
+	cout << "Post eval at " << IMG_WID << ", " << IMG_HEI << ":" << endl
+			<< out4;
 }

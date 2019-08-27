@@ -7,7 +7,7 @@ void setup() {
   convertTraining("/training.png", "../input/training.txt");
   }
   if (dispOutFile) {
-    product = convertImage("../output/out2.txt");
+    product = convertImage("../output/preOut3.txt");
     surface.setResizable(true);
     surface.setSize(product.width, product.height);
   }
