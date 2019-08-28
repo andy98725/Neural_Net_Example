@@ -19,8 +19,8 @@ FileReader::FileReader(string filename) {
 	for (string line; getline(file, line);) {
 		// Parse line
 		istringstream read(line);
-		double* iarr = new double[2];
-		double* oarr = new double[3];
+		long double *iarr = new long double[2];
+		long double *oarr = new long double[3];
 		// Load data
 		read >> iarr[0] >> iarr[1] >> oarr[0] >> oarr[1] >> oarr[2];
 		// Push to vectors

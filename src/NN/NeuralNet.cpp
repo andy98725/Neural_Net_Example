@@ -29,8 +29,8 @@ NeuralNet::NeuralNet(int inCount, int outCount, int hiddenCount, int layers) {
 		if (i == layers - 1) {
 			cols = outCount;
 		}
-		double *weightarr = new double[rows * cols],
-				*basearr = new double[cols];
+		long double *weightarr = new long double[rows * cols], *basearr =
+				new long double[cols];
 		for (int j = 0; j < rows * cols; ++j) {
 			// Get random 0-1
 			double r = (double) rand() / (RAND_MAX);
@@ -88,7 +88,8 @@ void NeuralNet::resetErrors() {
 		Matrix m = weights[i];
 		r = m.getr();
 		c = m.getc();
-		double *weightarr = new double[r * c], *basearr = new double[c];
+		long double *weightarr = new long double[r * c], *basearr =
+				new long double[c];
 		for (unsigned int j = 0; j < r * c; ++j) {
 			weightarr[j] = 0;
 		}
@@ -104,25 +105,6 @@ void NeuralNet::resetErrors() {
 void NeuralNet::backpropCase(Matrix in, Matrix expectedOut, double delta) {
 	//Make case errrors matching weight and base error matricies
 	Matrix *caseWeightError[layers], *caseBaseError[layers];
-//	for (int i = 0; i < layers; ++i) {
-//		int rows = hidCount, cols = hidCount;
-//		if (i == 0) {
-//			rows = inCount;
-//		}
-//		if (i == layers - 1) {
-//			cols = outCount;
-//		}
-//		double* weightarr = new double[rows * cols],
-//				*basearr = new double[cols];
-//		for (int j = 0; j < rows * cols; ++j) {
-//			weightarr[j] = 0;
-//		}
-//		for (int j = 0; j < cols; ++j) {
-//			basearr[j] = 0;
-//		}
-//		caseWeightError.push_back(Matrix(rows, cols, weightarr));
-//		caseBaseError.push_back(Matrix(1, cols, basearr));
-//	}
 	//Now, begin actual backpropogation. Get the output
 	Matrix output = eval(in);
 	//Backprop
@@ -193,14 +175,11 @@ void NeuralNet::backprop(vector<Matrix> ins, vector<Matrix> outs,
 	//Done evaluating. Clear then apply average errors.
 	resetEval();
 	for (unsigned int i = 0; i < weights.size(); ++i) {
-		// Normalize for sizes
-//		weightsError[i] *= (1.0 / ins.size());
 		// Change
 		weights[i] -= weightsError[i];
 	}
 	for (unsigned int i = 0; i < bases.size(); ++i) {
-		// Normalize for sizes
-//		basesError[i] *= (1.0 / ins.size());
+		// Change
 		bases[i] -= basesError[i];
 	}
 }
@@ -239,7 +218,7 @@ void NeuralNet::train(vector<Matrix> ins, vector<Matrix> outs) {
 	} else {
 		// Just train off data (50,000 times total)
 		for (unsigned int k = 0; k < 50000 / ins.size(); ++k) {
-			backprop(ins, outs, 0.9);
+			backprop(ins, outs, 10);
 		}
 	}
 }

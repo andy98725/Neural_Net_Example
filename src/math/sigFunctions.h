@@ -10,8 +10,8 @@
 
 #include<math.h>
 
-double sigmoid(double);
-double sigmoidPrime(double);
+long double sigmoid(long double);
+long double sigmoidPrime(long double);
 
 
 

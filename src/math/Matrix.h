@@ -19,12 +19,12 @@ using namespace std;
 class Matrix {
 private:
 	unsigned int r, c;
-	double* arr;
+	long double* arr;
 public:
 	//Default/Dimension constructor
-	Matrix(unsigned int r, unsigned int c, double v);
+	Matrix(unsigned int r, unsigned int c, long double v);
 	//Array initializer
-	Matrix(int, int, double*);
+	Matrix(int, int, long double*);
 	//Copy constructor
 	Matrix(const Matrix&);
 	//String constructor
@@ -36,9 +36,9 @@ public:
 	unsigned int getr();
 	unsigned int getc();
 	//Get value
-	double get(unsigned int, unsigned int);
+	long double get(unsigned int, unsigned int);
 	//Set value
-	void set(unsigned int, unsigned int, double);
+	void set(unsigned int, unsigned int, long double);
 	//Transpose
 	void transpose();
 	//Readable output
@@ -54,7 +54,7 @@ public:
 	void operator/=(const double); //Scalar divide
 
 	//Matrixwise apply function
-	void apply(double (*)(double));
+	void apply(long double (*)(long double));
 
 	//Save to string
 	string write();
