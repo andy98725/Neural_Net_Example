@@ -7,15 +7,16 @@ void setup() {
   convertTraining("/training.png", "../input/training.txt");
   }
   if (dispOutFile) {
-    product = convertImage("../output/preOut3.txt");
+    product = convertImage("../NNets/biggerOutput/testOut.txt");
     surface.setResizable(true);
     surface.setSize(product.width, product.height);
   }
 }
 
 void draw() {
-  if (dispOutFile)
+  if (dispOutFile){
     image(product, 0, 0);
+  }
 }
 
 PImage product;

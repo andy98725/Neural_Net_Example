@@ -201,24 +201,26 @@ void NeuralNet::train(vector<Matrix> ins, vector<Matrix> outs) {
 	// If size is > 100, do batch training
 	if (ins.size() > 100) {
 		// Size of each batch
-		int batchSize = 400;
+		int batchSize = 1;
 		// How many times should it do it?
-		int trainingTimes = ins.size() / batchSize;
+		int trainingTimes = ins.size();
+		// When should it print
+		int batchPrint = ins.size() / 8;
 		// Do batch training that many times
 		for (int k = 0; k < trainingTimes; ++k) {
 			// Only do if mod 100
-			if (k % 100 == 0) {
+			if (k % batchPrint == 0) {
 				cout << "Batch " << k << " of " << trainingTimes << "..."
 						<< endl;
 				cout.flush();
 			}
 			// Batch train
-			batchTrain(ins, outs, batchSize, 0.8);
+			batchTrain(ins, outs, batchSize, 2);
 		}
 	} else {
 		// Just train off data (50,000 times total)
 		for (unsigned int k = 0; k < 50000 / ins.size(); ++k) {
-			backprop(ins, outs, 10);
+			backprop(ins, outs, 1);
 		}
 	}
 }
